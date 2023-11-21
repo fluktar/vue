@@ -17,10 +17,6 @@ const TodosApp = {
         this.todos[todoIndex] = updatedTodoItem;
         this.editedTodoId = null;
       } else {
-     
-
-
-
         let response;
 
         try {
@@ -37,19 +33,18 @@ const TodosApp = {
           alert("Something went wrong!");
           return;
         }
-      
+
         if (!response.ok) {
           alert("Something went wrong!");
           return;
         }
-      
-        const responseData = await response.json();
-        
-        const newTodo = {
-            text: this.enteredTodoText,
-            id: todoId,
-          };
 
+        const responseData = await response.json();
+
+        const newTodo = {
+          text: this.enteredTodoText,
+          id: responseData.createdTodo.id,
+        };
 
         this.todos.push(newTodo);
       }

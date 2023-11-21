@@ -43,7 +43,7 @@ const TodosApp = {
 
         const newTodo = {
           text: this.enteredTodoText,
-          id: responseData.createdTodo.id,
+          id: responseData.createTodo.id,
         };
 
         this.todos.push(newTodo);

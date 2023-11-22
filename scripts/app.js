@@ -1,15 +1,44 @@
 const TodosApp = {
   data() {
-    return { todos: [], enteredTodoText: "New todo...", editedTodoId: null };
+    return {
+      isLoading: false,
+      todos: [],
+      enteredTodoText: "New todo...",
+      editedTodoId: null,
+    };
   },
   methods: {
     async saveTodo(event) {
       event.preventDefault();
       if (this.editedTodoId) {
         const todoId = this.editedTodoId;
+
+        let response;
+
+        try {
+          response = await fetch("http://localhost:3005/todos/" + todoId, {
+            method: "PATCH",
+            body: JSON.stringify({
+              newText: this.enteredTodoText,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+        } catch (error) {
+          alert("Something went wrong!");
+          return;
+        }
+
+        if (!response.ok) {
+          alert("Something went wrong!");
+          return;
+        }
+
         const todoIndex = this.todos.findIndex(function (todoItem) {
           return todoItem.id === todoId;
         });
+
         const updatedTodoItem = {
           id: this.todos[todoIndex].id,
           text: this.enteredTodoText,
@@ -57,11 +86,48 @@ const TodosApp = {
       });
       this.enteredTodoText = todo.text;
     },
-    deleteTodo(todoId) {
+    async deleteTodo(todoId) {
+      // przeglądarka
       this.todos = this.todos.filter(function (todoItem) {
         return todoItem.id !== todoId;
       });
+      //-------------
+      // serwer
+      let response;
+
+      try {
+        response = await fetch("http://localhost:3005/todos/" + todoId, {
+          method: "DELETE",
+        });
+      } catch (error) {
+        alert("Something went wrong!");
+        return;
+      }
+
+      if (!response.ok) {
+        alert("Something went wrong!");
+        return;
+      }
+      // --------------
     },
+  },
+  async created() {
+    let response;
+    this.isLoading = true;
+    try {
+      response = await fetch("http://localhost:3005/todos");
+    } catch (error) {
+      alert("Something went wrong!");
+      this.isLoading = false;
+      return;
+    }
+    this.isLoading = false;
+    if (!response.ok) {
+      alert("Something went wrong!");
+      return;
+    }
+    const responseData = await response.json();
+    this.todos = responseData.todos;
   },
 };
 Vue.createApp(TodosApp).mount("#todos-app");

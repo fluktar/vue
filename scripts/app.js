@@ -40,7 +40,6 @@ const TodosApp = {
         }
 
         const responseData = await response.json();
-        console.log(responseData);
         const newTodo = {
           text: this.enteredTodoText,
           id: responseData.createTodo.id,
